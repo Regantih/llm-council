@@ -124,7 +124,7 @@
   line-height: 1.5;
   outline: none;
   resize: vertical;
-  min-height: 80px;
+  min-height: 48px;
   max-height: 300px;
 }
 

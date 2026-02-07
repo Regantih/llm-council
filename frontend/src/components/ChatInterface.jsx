@@ -130,16 +130,7 @@ export default function ChatInterface({
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={isLoading}
-          rows={3}
-        />
-        <textarea
-          className="context-input"
-          placeholder="Paste product documentation or context here (optional)..."
-          value={context}
-          onChange={(e) => setContext(e.target.value)}
-          disabled={isLoading}
-          rows={3}
-          style={{ marginTop: '10px', fontSize: '0.9em', color: '#ccc' }}
+          rows={2}
         />
         <button
           type="submit"
