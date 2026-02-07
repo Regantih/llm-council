@@ -10,10 +10,24 @@ function App() {
   const [currentConversation, setCurrentConversation] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Load conversations on mount
+  const [connectionError, setConnectionError] = useState(false);
+
+  // Load conversations and check connection on mount
   useEffect(() => {
+    checkConnection();
     loadConversations();
   }, []);
+
+  const checkConnection = async () => {
+    try {
+      const res = await fetch('/api/conversations'); // Simple check
+      if (!res.ok) throw new Error('Backend unreachable');
+      setConnectionError(false);
+    } catch (err) {
+      console.error('Connection check failed:', err);
+      setConnectionError(true);
+    }
+  };
 
   // Load conversation details when selected
   useEffect(() => {
@@ -183,6 +197,16 @@ function App() {
 
   return (
     <div className="app">
+      {connectionError && (
+        <div className="error-banner" style={{
+          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999,
+          background: '#ff4444', color: 'white', padding: '10px', textAlign: 'center',
+          fontWeight: 'bold'
+        }}>
+          ⚠️ Cannot connect to Backend. Please verify the server is running on port 8001.
+          <button onClick={checkConnection} style={{ marginLeft: '10px', padding: '2px 8px', color: 'black' }}>Retry</button>
+        </div>
+      )}
       <Sidebar
         conversations={conversations}
         currentConversationId={currentConversationId}
