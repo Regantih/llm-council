@@ -122,35 +122,34 @@ export default function ChatInterface({
         <div ref={messagesEndRef} />
       </div>
 
-      {conversation.messages.length === 0 && (
-        <form className="input-form" onSubmit={handleSubmit}>
-          <textarea
-            className="message-input"
-            placeholder="Ask your question... (Shift+Enter for new line, Enter to send)"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            disabled={isLoading}
-            rows={3}
-          />
-          <textarea
-            className="context-input"
-            placeholder="Paste product documentation or context here (optional)..."
-            value={context}
-            onChange={(e) => setContext(e.target.value)}
-            disabled={isLoading}
-            rows={3}
-            style={{ marginTop: '10px', fontSize: '0.9em', color: '#ccc' }}
-          />
-          <button
-            type="submit"
-            className="send-button"
-            disabled={!input.trim() || isLoading}
-          >
-            Send
-          </button>
-        </form>
-      )}
+      <form className="input-form" onSubmit={handleSubmit}>
+        <textarea
+          className="message-input"
+          placeholder="Ask your question... (Shift+Enter for new line, Enter to send)"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          disabled={isLoading}
+          rows={3}
+        />
+        <textarea
+          className="context-input"
+          placeholder="Paste product documentation or context here (optional)..."
+          value={context}
+          onChange={(e) => setContext(e.target.value)}
+          disabled={isLoading}
+          rows={3}
+          style={{ marginTop: '10px', fontSize: '0.9em', color: '#ccc' }}
+        />
+        <button
+          type="submit"
+          className="send-button"
+          disabled={!input.trim() || isLoading}
+        >
+          Send
+        </button>
+      </form>
     </div>
   );
 }
+
