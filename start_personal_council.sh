@@ -6,15 +6,24 @@ echo "=================================================="
 echo "   Starting Your Personal LLM Council"
 echo "=================================================="
 
-# 1. Check for .env file
-if [ ! -f .env ]; then
-    echo "⚠️  No .env file found!"
-    echo "Creating one for you..."
-    echo "OPENROUTER_API_KEY=your_key_here" > .env
-    echo ""
-    echo "❌ PLEASE EDIT .env AND ADD YOUR OPENROUTER API KEY."
-    echo "Then run this script again."
-    exit 1
+# 1. Check for .env file or Environment Variable
+if [ -z "$OPENROUTER_API_KEY" ]; then
+    if [ -f .env ]; then
+        export $(cat .env | xargs)
+    fi
+
+    if [ -z "$OPENROUTER_API_KEY" ]; then
+        echo "⚠️  No .env file found and OPENROUTER_API_KEY not set!"
+        echo "Creating .env template for you..."
+        echo "OPENROUTER_API_KEY=your_key_here" > .env
+        echo ""
+        echo "❌ PLEASE EDIT .env AND ADD YOUR OPENROUTER API KEY."
+        echo "   OR set the OPENROUTER_API_KEY environment variable (e.g. in Codespaces Secrets)."
+        echo "Then run this script again."
+        exit 1
+    fi
+else
+    echo "✅ OPENROUTER_API_KEY found in environment."
 fi
 
 # 2. Check for uv (Python package manager)
