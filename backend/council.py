@@ -5,13 +5,14 @@ from .openrouter import query_models_parallel, query_model
 from .config import COUNCIL_MODELS, CHAIRMAN_MODEL
 
 
-async def stage1_collect_responses(user_query: str, context: str | None = None) -> List[Dict[str, Any]]:
+async def stage1_collect_responses(user_query: str, context: str | None = None, history: List[Dict[str, str]] | None = None) -> List[Dict[str, Any]]:
     """
     Stage 1: Collect individual responses from all council models.
 
     Args:
         user_query: The user's question
         context: Optional context/documentation
+        history: Optional list of prior messages [{"role": "user"/"assistant", "content": "..."}]
 
     Returns:
         List of dicts with 'model' and 'response' keys
@@ -20,8 +21,12 @@ async def stage1_collect_responses(user_query: str, context: str | None = None) 
         prompt_content = f"Context Information:\n{context}\n\nQuestion: {user_query}\n\nPlease answer the question using the provided context information if relevant."
     else:
         prompt_content = user_query
-        
-    messages = [{"role": "user", "content": prompt_content}]
+
+    # Build messages with conversation history
+    messages = []
+    if history:
+        messages.extend(history)
+    messages.append({"role": "user", "content": prompt_content})
 
     # Query all models in parallel
     responses = await query_models_parallel(COUNCIL_MODELS, messages)
@@ -304,18 +309,20 @@ Title:"""
     return title
 
 
-async def run_full_council(user_query: str, context: str | None = None) -> Tuple[List, List, Dict, Dict]:
+async def run_full_council(user_query: str, context: str | None = None, history: List[Dict[str, str]] | None = None) -> Tuple[List, List, Dict, Dict]:
     """
     Run the complete 3-stage council process.
 
     Args:
         user_query: The user's question
+        context: Optional context/documentation
+        history: Optional conversation history
 
     Returns:
         Tuple of (stage1_results, stage2_results, stage3_result, metadata)
     """
-    # Stage 1: Collect individual responses
-    stage1_results = await stage1_collect_responses(user_query, context)
+    # Stage 1: Collect individual responses (with history for context)
+    stage1_results = await stage1_collect_responses(user_query, context, history)
 
     # If no models responded successfully, return error
     if not stage1_results:

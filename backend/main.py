@@ -141,6 +141,15 @@ async def send_message_stream(conversation_id: str, request: SendMessageRequest)
 
     async def event_generator():
         try:
+            # Build conversation history from prior messages
+            history = []
+            for msg in conversation["messages"]:
+                if msg["role"] == "user":
+                    history.append({"role": "user", "content": msg["content"]})
+                elif msg["role"] == "assistant" and msg.get("stage3"):
+                    # Use the chairman's synthesized answer as the assistant's reply
+                    history.append({"role": "assistant", "content": msg["stage3"].get("response", "")})
+
             # Add user message
             storage.add_user_message(conversation_id, request.content)
 
@@ -149,9 +158,9 @@ async def send_message_stream(conversation_id: str, request: SendMessageRequest)
             if is_first_message:
                 title_task = asyncio.create_task(generate_conversation_title(request.content))
 
-            # Stage 1: Collect responses
+            # Stage 1: Collect responses (with conversation history)
             yield f"data: {json.dumps({'type': 'stage1_start'})}\n\n"
-            stage1_results = await stage1_collect_responses(request.content, request.context)
+            stage1_results = await stage1_collect_responses(request.content, request.context, history if history else None)
             yield f"data: {json.dumps({'type': 'stage1_complete', 'data': stage1_results})}\n\n"
 
             # Stage 2: Collect rankings
